@@ -1,5 +1,8 @@
 import sys
+
 import web
+
+from feedstory.rss.result import JsonRssResult
 
 
 urls = ('/cache/feed', 'FeedCacheService',
@@ -15,14 +18,16 @@ class FeedCacheService(object):
         user_data = web.input()
         feed_cache = caches.get_cache(**user_data)
 
-        result = feed_cache.get_last_result(user_data.url)
-        return result.json if result else ''
+        json = feed_cache.get_last_feed_json(user_data.url)
+        return json if json else ''
 
     def POST(self):
-        user_data = web.input()
+        user_data = web.input(_unicode=False)
+
         feed_cache = caches.get_cache(**user_data)
-        user_data = web.input()
-        feed_cache.add_feed_result(user_data.feed)
+
+        result = JsonRssResult(user_data.json, request_etag=user_data.get('etag'))
+        feed_cache.add_feed_result(result)
 
 
 def serve(feed_caches, port=8088):

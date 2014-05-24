@@ -1,11 +1,10 @@
-import os
 from dated.normalized import utc
-import quelo
 
 from .db.feed_entry import get_feed_entry, get_feed_entry_id, insert_feed_entry
 from .db.feed_result import insert_feed_result_location, get_feed_result_location_id, get_feed_result_id, \
     insert_feed_result, insert_feed, update_feed_result, insert_feed_result_unread, insert_rss_feed_result, \
-    get_feed_result_entry_id, insert_feed_result_entry, get_feed_id
+    get_feed_result_entry_id, insert_feed_result_entry, get_feed_id, get_latest_feed_json
+from feedstory.rss.result import JsonRssResult
 
 from ..result import FeedEntryPage
 
@@ -41,7 +40,7 @@ class FeedCacheDb(object):
     def _add_result_type(self, result):
         #This is to mark that we are inserting a standard rss result, other feed results types are possible
         # (google reader, etc)
-        insert_rss_feed_result(self._cursor, result.db_id)
+        insert_rss_feed_result(self._cursor, result.db_id, result.request_etag)
 
     def _add_feed_result_url(self, result, feed_url):
         # The location(url) of the result, in case of the simple rss feed it is equals to the feed url,
@@ -103,17 +102,15 @@ class FeedCache(FeedCacheDb):
 
         self._conn.commit()
 
+    def get_last_feed_json(self, feed_url):
+        json = get_latest_feed_json(self._cursor, feed_url)
+        return json
+
+    def get_last_result(self, feed_url):
+        json = self.get_last_feed_json(feed_url)
+
+        if json:
+            return JsonRssResult(json)
+
     def close(self):
         self._conn.close()
-
-_init_file = os.path.join(os.path.dirname(__file__), 'feed_cache.sql')
-
-
-class FeedCacheConnect(object):
-
-    def __init__(self, connection=quelo.connect):
-        self._connection = connection
-
-    def __call__(self, path):
-        conn = self._connection(path, init_file=_init_file)
-        return FeedCache(conn)

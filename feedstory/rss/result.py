@@ -1,5 +1,5 @@
 from dated import utc
-from procol.console import print_err_trace
+from procol.console import print_err
 
 from .result_json import feed_to_json, json_to_feed
 from ..result import FeedEntry, FeedResult
@@ -39,7 +39,7 @@ def _result_publication(feed_result, entries):
 class FeedParserEntries(RssEntries):
 
     def __init__(self, result, json, request_etag=None):
-        entries, broken = _partition_valid_broken_entries(result.entries)
+        entries, broken = _partition_valid_broken_entries(result.entries, result.encoding)
         super(FeedParserEntries, self).__init__(result, json, entries, request_etag)
         self.broken_entries = broken
 
@@ -47,7 +47,7 @@ class FeedParserEntries(RssEntries):
 class RssResult(FeedParserEntries):
 
     def __init__(self, result, request_etag=None):
-        super(RssResult, self).__init__(result, feed_to_json(result), request_etag)
+        super(RssResult, self).__init__(result, feed_to_json(result, result.encoding), request_etag)
 
 
 class JsonRssResult(FeedParserEntries):
@@ -57,19 +57,18 @@ class JsonRssResult(FeedParserEntries):
 
 
 class FeedParserEntry(FeedEntry):
-    def __init__(self, entry):
+    def __init__(self, entry, json):
         publication = utc.from_timestamp(entry.published_parsed)
-        entry_json = feed_to_json(entry)
 
-        super(FeedParserEntry, self).__init__(entry.link, entry.title, publication, entry.summary, entry_json)
+        super(FeedParserEntry, self).__init__(entry.link, entry.title, publication, entry.summary, json)
 
 
-def _partition_valid_broken_entries(entries):
+def _partition_valid_broken_entries(entries, encoding):
     valid, broken = [], []
     page_entries = (entry for entry in entries if entry.link)
 
     for entry in page_entries:
-        feed_entry = _feed_entry(entry)
+        feed_entry = _feed_entry(entry, feed_to_json(entry, encoding))
 
         if feed_entry:
             valid.append(feed_entry)
@@ -79,12 +78,11 @@ def _partition_valid_broken_entries(entries):
     return valid, broken
 
 
-def _feed_entry(entry):
+def _feed_entry(entry, json):
     try:
-        return FeedParserEntry(entry)
+        return FeedParserEntry(entry, json)
     except AttributeError, e:
-        print_err_trace(e)
-        pass
+        print_err('Print error on entry: ', e, entry)
 
 
 class RssErrorResult(RssResult):

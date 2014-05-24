@@ -4,10 +4,11 @@ import time
 import feedparser
 from dated.date_string import datetime_string, datetime_from_string
 from dated import local, utc
+from unicoder import decoded
 
 
-def feed_to_json(feed):
-    return json.dumps(feed, default=_feed_to_json, indent=4)
+def feed_to_json(feed, encoding):
+    return decoded(json.dumps(feed, default=_feed_to_json, indent=4, encoding=encoding), encoding)
 
 
 def _feed_to_json(obj):
@@ -40,5 +41,5 @@ def _feed_dict(d):
 
 
 def _utc_tuple_from_string(date_str):
-    utc_time = local.to_uc(datetime_from_string(date_str))
+    utc_time = local.to_utc(datetime_from_string(date_str))
     return utc_time.timetuple()
