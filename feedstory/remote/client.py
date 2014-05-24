@@ -4,8 +4,8 @@ from httpy.client import http_client
 from urlo.parser import build_url
 from dated.date_string import datetime_from_string
 
-from ..feedstory.rss.feed_json import json_to_feed
-from ..feedstory.rss.rss_feed import JsonRssResult
+from ..rss.result_json import json_to_feed
+from ..rss.result import JsonRssResult
 from ..result import FeedEntryPage
 
 

@@ -3,7 +3,7 @@ from quelo.query import execute, get_value, get_row
 
 def insert_feed_entry(c, feed_id, url, title, summary, publication, data):
     execute(c, '''insert into feed_entry(feed_id, url, title, summary, published, data)
-                         values(?,?,?,?,?,?) ''', (feed_id, url, title, summary, publication, data))
+                    values(?,?,?,?,?,?) ''', (feed_id, url, title, summary, publication, data))
 
 
 def get_feed_entry_id(c, feed_id, url):

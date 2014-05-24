@@ -7,6 +7,7 @@ class FeedResult(object):
         self.url = url
         self.title = title
         self.description = description
+
         self.updated = updated
         self.entries = entries
         self.json = json
@@ -41,7 +42,3 @@ class FeedEntry(FeedEntryPage):
         self.date = self.publication.date()
         self.summary = summary
         self.json = json
-
-
-class FeedUnreadEntries(FeedResult):
-    pass

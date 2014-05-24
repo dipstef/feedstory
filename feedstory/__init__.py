@@ -1,12 +1,12 @@
-from feedstory.result import FeedUnreadEntries
+from feedstory.result import FeedResult
 from .result import FeedEntryPage
 from .rss import parse_feed_result
 
 
-class FeedParserUnreadEntries(FeedUnreadEntries):
+class FeedParserUnreadEntries(FeedResult):
     def __init__(self, result, entries, unread_entries):
         super(FeedParserUnreadEntries, self).__init__(result.url, result.title, result.description, result.updated,
-                                                      result.json, entries, unread=True)
+                                                      result.json, entries)
         self.unread_entries = unread_entries
         self.etag = result.etag
 

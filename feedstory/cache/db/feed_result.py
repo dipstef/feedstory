@@ -3,7 +3,7 @@ from quelo.query import get_results, get_value, execute
 
 def insert_feed(c, url, title, description):
     execute(c, '''insert into feed (url, title, description)
-                                     values(?,?,?) ''', (url, title, description))
+                    values(?,?,?) ''', (url, title, description))
 
 
 def get_feed_id(cursor, url):
@@ -44,7 +44,7 @@ def insert_feed_result_location(c, feed_id, result_url):
 
 def insert_feed_result(c, result_id, published, updated, data):
     execute(c, '''insert into feed_result(result_id, published, updated, data)
-                         values(?,?,?,?)''', (result_id, published, updated, data))
+                    values(?,?,?,?)''', (result_id, published, updated, data))
 
 
 def get_feed_result_id(c, result_id, published):
@@ -63,17 +63,17 @@ def update_feed_result(cursor, feed_result_id, updated, json):
 
 def insert_rss_feed_result(c, feed_result_id):
     execute(c, '''insert into rss_feed_result(feed_result_id)
-                         values(?)''', (feed_result_id, ))
+                    values(?)''', (feed_result_id, ))
 
 
 def insert_feed_result_unread(c, feed_result_id):
     execute(c, '''insert into feed_result_unread(feed_result_id)
-                         values(?)''', (feed_result_id, ))
+                    values(?)''', (feed_result_id, ))
 
 
 def insert_feed_result_entry(c, feed_result_id, feed_entry_id):
     execute(c, '''insert into feed_result_entry(feed_result_id, feed_entry_id)
-                         values(?,?)''', (feed_result_id, feed_entry_id))
+                    values(?,?)''', (feed_result_id, feed_entry_id))
 
 
 def get_feed_result_entry_id(c, feed_result_id, feed_entry_id):
