@@ -1,0 +1,4 @@
+git+git://github.com/dipstef/quecco.git
+git+git://github.com/dipstef/urlo.git
+git+git://github.com/dipstef/procol.git
+git+git://github.com/dipstef/httpy.git
