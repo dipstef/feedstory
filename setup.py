@@ -1,5 +1,4 @@
 from distutils.core import setup
-from setuptools import find_packages
 
 VERSION = '0.1'
 
@@ -13,7 +12,7 @@ setup(name=name,
       author_email='dipstef@github.com',
       url='http://github.com/dipstef/{}/'.format(name),
       description=desc,
-      packages=find_packages(),
+      packages=['feedstory', 'feedstory.cache', 'feedstory.cache.db', 'feedstory.remote', 'feedstory.rss'],
       platforms=['Any'],
       requires=['web.py', 'feedparser', 'quecco', 'urlo', 'httpy_client']
 )
