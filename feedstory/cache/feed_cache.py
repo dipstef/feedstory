@@ -4,7 +4,7 @@ from .db.feed_entry import get_feed_entry, get_feed_entry_id, insert_feed_entry
 from .db.feed_result import insert_feed_result_location, get_feed_result_location_id, get_feed_result_id, \
     insert_feed_result, insert_feed, update_feed_result, insert_feed_result_unread, insert_rss_feed_result, \
     get_feed_result_entry_id, insert_feed_result_entry, get_feed_id, get_latest_feed_json
-from feedstory.rss.result import JsonRssResult
+from ..rss.result import JsonRssResult
 
 from ..result import FeedEntryPage
 
