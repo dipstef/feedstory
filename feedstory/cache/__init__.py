@@ -1,6 +1,8 @@
 import os
+
 import quelo
-from feedstory.cache.feed_cache import FeedCache
+
+from .feed_cache import FeedCache
 
 
 _init_file = os.path.join(os.path.dirname(__file__), 'feed_cache.sql')

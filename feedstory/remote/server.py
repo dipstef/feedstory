@@ -2,7 +2,7 @@ import sys
 
 import web
 
-from feedstory.rss.result import JsonRssResult
+from ..rss.result import JsonRssResult
 
 
 urls = ('/cache/feed', 'FeedCacheService',
