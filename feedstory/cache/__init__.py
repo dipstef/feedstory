@@ -1,7 +1,6 @@
 import os
 
 import quelo
-
 from .feed_cache import FeedCache
 
 

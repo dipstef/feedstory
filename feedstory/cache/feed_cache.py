@@ -14,6 +14,28 @@ class FeedCacheDb(object):
         self._conn = conn
         self._cursor = conn.cursor()
 
+    def _add_feed(self, result, feed_url):
+        feed_id = get_feed_id(self._cursor, result.url)
+
+        if not feed_id:
+            insert_feed(self._cursor, feed_url, result.title, result.description)
+            feed_id = get_feed_id(self._cursor, feed_url)
+
+        result.feed_id = feed_id
+
+    def _add_feed_result_url(self, result, feed_url):
+        # The location(url) of the result, in case of the simple rss feed it is equals to the feed url,
+        # however in cases as google reader or feedly where the feed history could be scrolled this equal to the
+        # result set url
+        self._add_feed(result, feed_url)
+
+        result_location_id = get_feed_result_location_id(self._cursor, result.feed_id, result.url)
+        if not result_location_id:
+            insert_feed_result_location(self._cursor, result.feed_id, result.url)
+            result_location_id = get_feed_result_location_id(self._cursor, result.feed_id, result.url)
+
+        result.location_id = result_location_id
+
     def _add_feed_result(self, result, feed_url):
         self._add_feed_result_url(result, feed_url)
 
@@ -41,28 +63,6 @@ class FeedCacheDb(object):
         # (google reader, etc)
         insert_rss_feed_result(self._cursor, result.db_id, result.request_etag)
 
-    def _add_feed_result_url(self, result, feed_url):
-        # The location(url) of the result, in case of the simple rss feed it is equals to the feed url,
-        # however in cases as google reader or feedly where the feed history could be scrolled this equal to the
-        # result set url
-        self._add_feed(result, feed_url)
-
-        result_location_id = get_feed_result_location_id(self._cursor, result.feed_id, result.url)
-        if not result_location_id:
-            insert_feed_result_location(self._cursor, result.feed_id, result.url)
-            result_location_id = get_feed_result_location_id(self._cursor, result.feed_id, result.url)
-
-        result.location_id = result_location_id
-
-    def _add_feed(self, result, feed_url):
-        feed_id = get_feed_id(self._cursor, result.url)
-
-        if not feed_id:
-            insert_feed(self._cursor, feed_url, result.title, result.description)
-            feed_id = get_feed_id(self._cursor, feed_url)
-
-        result.feed_id = feed_id
-
     def _add_feed_entry(self, feed_result, entry):
         feed_entry_id = get_feed_entry_id(self._cursor, feed_result.feed_id, entry.url)
 
@@ -73,16 +73,16 @@ class FeedCacheDb(object):
 
         self._add_result_entry(feed_result, entry)
 
-    def _add_result_entry(self, feed_result, entry):
-        feed_result_entry_id = get_feed_result_entry_id(self._cursor, feed_result.db_id, entry.db_id)
-        if not feed_result_entry_id:
-            insert_feed_result_entry(self._cursor, feed_result.db_id, entry.db_id)
-
     def _add_entry(self, result, entry, json):
         insert_feed_entry(self._cursor, result.feed_id, entry.url, entry.title, entry.summary, entry.publication, json)
 
         feed_entry_id = get_feed_entry_id(self._cursor, result.feed_id, entry.url)
         return feed_entry_id
+
+    def _add_result_entry(self, feed_result, entry):
+        feed_result_entry_id = get_feed_result_entry_id(self._cursor, feed_result.db_id, entry.db_id)
+        if not feed_result_entry_id:
+            insert_feed_result_entry(self._cursor, feed_result.db_id, entry.db_id)
 
 
 class FeedCache(FeedCacheDb):
