@@ -2,10 +2,9 @@ from distutils.core import setup
 
 VERSION = '0.1'
 
-desc = """Sqlite response cache for httpy. Used together with an httpy_client will retrieve cached responses or
- store responses from the client."""
+desc = """Feed cache, enables to keep an history of the feed published entries through time"""
 
-name = 'catechu'
+name = 'feedstory'
 
 setup(name=name,
       version=VERSION,
@@ -13,7 +12,7 @@ setup(name=name,
       author_email='dipstef@github.com',
       url='http://github.com/dipstef/{}/'.format(name),
       description=desc,
-      packages = ['catechu.http', 'catechu.zeromq'],
+      packages = ['feedstory', 'feedstory.cache', 'feedstory.cache.db', 'feedstory.remote', 'feedstory.rss'],
       platforms=['Any'],
-      requires=['web.py', 'feedparser', 'httpy']
+      requires=['web.py', 'feedparser', 'httpy_client', 'procol']
 )
