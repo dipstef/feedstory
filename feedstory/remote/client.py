@@ -1,6 +1,6 @@
 from urlparse import urljoin
 
-from httpy.client import http_client
+from httpy_client import http_client
 from urlo.parser import build_url
 
 from ..rss.result import JsonRssResult
