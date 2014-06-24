@@ -1,4 +1,4 @@
-from dated.normalized import utc
+from datetime import datetime
 
 from .db.feed_entry import get_feed_entry, get_feed_entry_id, insert_feed_entry
 from .db.feed_result import insert_feed_result_location, get_feed_result_location_id, get_feed_result_id, \
@@ -46,11 +46,11 @@ class FeedCacheDb(object):
 
             self._add_result_type(result)
         else:
-            update_feed_result(self._cursor, feed_result_id, utc.now(), result.json)
+            update_feed_result(self._cursor, feed_result_id, datetime.utcnow(), result.json)
             result.db_id = feed_result_id
 
     def _add_result(self, result):
-        insert_feed_result(self._cursor, result.location_id, result.updated, utc.now(), result.json)
+        insert_feed_result(self._cursor, result.location_id, result.updated, datetime.utcnow(), result.json)
 
         feed_result_id = get_feed_result_id(self._cursor, result.location_id, result.updated)
         #This is to mark that we have been requesting unread entries

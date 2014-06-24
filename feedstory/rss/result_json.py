@@ -2,8 +2,7 @@ import json
 import time
 
 import feedparser
-from dated.date_string import datetime_string, datetime_from_string
-from dated import local, utc
+from dated import utc
 from unicoder import decoded
 
 
@@ -13,11 +12,9 @@ def feed_to_json(feed, encoding):
 
 def _feed_to_json(obj):
     if isinstance(obj, time.struct_time):
-        utc_datetime = utc.from_timestamp(obj)
+        utc_datetime = utc.from_time_tuple(obj)
 
-        date_string = datetime_string(utc_datetime)
-
-        time_dict = {'datetime': date_string}
+        time_dict = {'datetime': utc_datetime.to_string()}
 
         return time_dict
     elif isinstance(obj, BaseException):
@@ -41,5 +38,5 @@ def _feed_dict(d):
 
 
 def _utc_tuple_from_string(date_str):
-    utc_time = local.to_utc(datetime_from_string(date_str))
+    utc_time = utc.from_string(date_str)
     return utc_time.timetuple()

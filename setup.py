@@ -14,5 +14,5 @@ setup(name=name,
       description=desc,
       packages=['feedstory', 'feedstory.cache', 'feedstory.cache.db', 'feedstory.remote', 'feedstory.rss'],
       platforms=['Any'],
-      requires=['web.py', 'feedparser', 'quecco', 'urlo', 'httpy_client', 'procol']
+      requires=['web.py', 'feedparser', 'quecco', 'urlo', 'httpy', 'procol']
 )
