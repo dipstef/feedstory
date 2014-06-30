@@ -1,10 +1,10 @@
-from quecco import scope
+import quecco
 from feedstory.remote.server import serve
 from tests import FeedCaches
 
 
 def main():
-    caches = FeedCaches(scope.threads)
+    caches = FeedCaches(quecco.threads)
     serve(caches, port=8088)
 
 

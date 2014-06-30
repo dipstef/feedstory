@@ -29,8 +29,8 @@ class RssEntries(FeedResult):
 
 def _result_publication(feed_result, entries):
     try:
-        publication_date = utc.from_timestamp(feed_result.feed.published_parsed)
-    except AttributeError:
+        publication_date = utc.from_time_tuple(feed_result.feed.published_parsed).to_datetime()
+    except AttributeError, e:
         publication_date = max([entry.publication for entry in entries])
 
     return publication_date
@@ -58,7 +58,7 @@ class JsonRssResult(FeedParserEntries):
 
 class FeedParserEntry(FeedEntry):
     def __init__(self, entry, json):
-        publication = utc.from_timestamp(entry.published_parsed)
+        publication = utc.from_time_tuple(entry.published_parsed).to_datetime()
 
         super(FeedParserEntry, self).__init__(entry.link, entry.title, publication, entry.summary, json)
 

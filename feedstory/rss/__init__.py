@@ -2,7 +2,7 @@ import time
 from urllib2 import URLError
 
 import feedparser
-from procol.console import print_err
+from procol.console import print_err, print_err_trace
 
 from .result import FeedUnchanged, RssErrorResult, RssResult
 
@@ -15,7 +15,7 @@ def parse_feed_result(feed_url, etag=None):
             print_err(str(e))
             time.sleep(10)
         except BaseException, e:
-            print_err('Exception: %s : %s' % (type(e), e))
+            print_err_trace('Exception: %s : %s' % (type(e), e))
             time.sleep(60)
 
 

@@ -8,9 +8,9 @@ _cache_path = os.path.join(os.path.dirname(__file__), 'feed_cache.db')
 
 class FeedCaches(object):
 
-    def __init__(self, scope=quecco.scope.local):
+    def __init__(self, connection=quecco.local):
         self._conn = None
-        self._connect = FeedCacheConnect(quecco.get_connection(scope))
+        self._connect = FeedCacheConnect(connection)
 
     #can return a cache by site or feed category
     def get_cache(self, **kwargs):

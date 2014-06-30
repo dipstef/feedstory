@@ -1,13 +1,13 @@
 from urlparse import urljoin
 
-from httpy.client import http_client
+from httpy import httpy
 from urlo.unquoted import build_url
 
 from ..rss.result import JsonRssResult
 
 
 class FeedCacheClient(object):
-    def __init__(self, address, client=http_client):
+    def __init__(self, address, client=httpy):
         self._client = client
         self._result_url = build_url(host=address[0], port=address[1], path='/cache/feed')
         self._entry_url = urljoin(self._result_url, '/entry')
