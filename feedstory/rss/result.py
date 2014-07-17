@@ -21,7 +21,7 @@ class RssEntries(FeedResult):
         self._feed = result
 
         self.request_etag = request_etag
-        self.etag = result.etag
+        self.etag = result.get('etag')
 
     def is_for_unread_entries(self):
         return bool(self.request_etag)
@@ -29,7 +29,7 @@ class RssEntries(FeedResult):
 
 def _result_publication(feed_result, entries):
     try:
-        publication_date = utc.from_time_tuple(feed_result.feed.published_parsed).to_datetime()
+        publication_date = feed_result.feed.published_parsed
     except AttributeError, e:
         publication_date = max([entry.publication for entry in entries])
 
@@ -58,7 +58,7 @@ class JsonRssResult(FeedParserEntries):
 
 class FeedParserEntry(FeedEntry):
     def __init__(self, entry, json):
-        publication = utc.from_time_tuple(entry.published_parsed).to_datetime()
+        publication = utc.from_time_tuple(entry.published_parsed)
 
         super(FeedParserEntry, self).__init__(entry.link, entry.title, publication, entry.summary, json)
 

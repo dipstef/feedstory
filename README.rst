@@ -32,7 +32,7 @@ Entries are stored in the cache with the latest etag
     assert cache_result.etag == result.etag
     assert len(cache_result.entries) == len(result.entries)
 
-    #given no entries have been published
+    #given no entries have been published from the last call
     >>> result = feeds.add_entries('https://news.ycombinator.com/rss')
     assert not result.entries
 

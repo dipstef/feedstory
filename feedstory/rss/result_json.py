@@ -29,14 +29,10 @@ def json_to_feed(feed_json):
 
 def _feed_dict(d):
     if 'datetime' in d:
-        inst = _utc_tuple_from_string(d['datetime'])
+        utc_time = utc.from_string(d['datetime'])
+        inst = utc_time.timetuple()
     elif isinstance(d, dict):
         inst = feedparser.FeedParserDict(d)
     else:
         inst = d
     return inst
-
-
-def _utc_tuple_from_string(date_str):
-    utc_time = utc.from_string(date_str)
-    return utc_time.timetuple()

@@ -1,10 +1,18 @@
 import time
 from urllib2 import URLError
+from dated import utc_from_string
 
 import feedparser
 from procol.console import print_err, print_err_trace
 
 from .result import FeedUnchanged, RssErrorResult, RssResult
+
+
+def _to_utc(datetime_string):
+    utc = utc_from_string(datetime_string)
+    return utc.timetuple()
+
+feedparser.registerDateHandler(_to_utc)
 
 
 def parse_feed_result(feed_url, etag=None):
