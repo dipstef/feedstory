@@ -1,3 +1,4 @@
+from datetime import datetime
 from dated import utc
 from procol.console import print_err
 
@@ -57,8 +58,11 @@ class JsonRssResult(FeedParserEntries):
 
 
 class FeedParserEntry(FeedEntry):
-    def __init__(self, entry, json):
-        publication = utc.from_time_tuple(entry.published_parsed)
+    def __init__(self, entry, json, parse_date):
+        try:
+            publication = utc.from_time_tuple(entry.published_parsed)
+        except AttributeError:
+            publication = parse_date
 
         super(FeedParserEntry, self).__init__(entry.link, entry.title, publication, entry.summary, json)
 
@@ -67,8 +71,9 @@ def _partition_valid_broken_entries(entries, encoding):
     valid, broken = [], []
     page_entries = (entry for entry in entries if entry.link)
 
+    utc_now = datetime.utcnow()
     for entry in page_entries:
-        feed_entry = _feed_entry(entry, feed_to_json(entry, encoding))
+        feed_entry = _feed_entry(entry, feed_to_json(entry, encoding), parse_date=utc_now)
 
         if feed_entry:
             valid.append(feed_entry)
@@ -78,9 +83,9 @@ def _partition_valid_broken_entries(entries, encoding):
     return valid, broken
 
 
-def _feed_entry(entry, json):
+def _feed_entry(entry, json, parse_date):
     try:
-        return FeedParserEntry(entry, json)
+        return FeedParserEntry(entry, json, parse_date)
     except AttributeError, e:
         print_err('Print error on entry: ', e, entry)
 

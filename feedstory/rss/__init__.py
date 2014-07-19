@@ -28,7 +28,7 @@ def parse_feed_result(feed_url, etag=None):
 
 
 def _parse_feed_result(feed_url, etag=None):
-    feed = feedparser.parse(feed_url, etag=etag)
+    feed = _feed_parse(feed_url, etag)
 
     if not 'bozo_exception' in feed:
         return FeedUnchanged(feed_url, feed, etag) if feed.status == 304 else RssResult(feed, etag)
@@ -36,3 +36,8 @@ def _parse_feed_result(feed_url, etag=None):
         raise feed.bozo_exception
     else:
         return RssErrorResult(feed, feed.bozo_exception, etag)
+
+
+def _feed_parse(feed_url, etag=None):
+    feed = feedparser.parse(feed_url, etag=etag)
+    return feed
