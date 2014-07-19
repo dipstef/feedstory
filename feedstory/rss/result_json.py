@@ -4,6 +4,7 @@ import time
 import feedparser
 from dated import utc
 from unicoder import decoded
+import cPickle as pickle
 
 
 def feed_to_json(feed, encoding):
@@ -18,7 +19,7 @@ def _feed_to_json(obj):
 
         return time_dict
     elif isinstance(obj, BaseException):
-        return {'error': obj.message}
+        return {'error': pickle.dumps(obj)}
     else:
         raise TypeError(repr(obj) + ' is not JSON serializable')
 
@@ -31,6 +32,8 @@ def _feed_dict(d):
     if 'datetime' in d:
         utc_time = utc.from_string(d['datetime'])
         inst = utc_time.timetuple()
+    elif 'error' in d:
+        inst = pickle.loads(d['error'])
     elif isinstance(d, dict):
         inst = feedparser.FeedParserDict(d)
     else:
