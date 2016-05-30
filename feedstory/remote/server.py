@@ -1,43 +1,76 @@
-import sys
+import inspect
 
-import web
+from bottle import Bottle, BaseRequest, request
 
 from ..rss.result import JsonRssResult
 
-
-urls = ('/cache/feed', 'FeedCacheService',
-        '/cache/feed/entry', 'FeedEntryCacheService')
+app = Bottle()
 
 
-app = web.application(urls, globals())
+@app.get('/cache/feed')
+def get_response(caches):
+    cache = caches.get_cache(**request.query)
+
+    json = cache.get_last_feed_json(request.query['url'])
+    return json if json else ''
 
 
-class FeedCacheService(object):
+@app.post('/cache/feed')
+def save_response(caches):
+    cache = caches.get_cache(**request.query)
 
-    def GET(self):
-        user_data = web.input()
-        feed_cache = caches.get_cache(**user_data)
-
-        json = feed_cache.get_last_feed_json(user_data.url)
-        return json if json else ''
-
-    def POST(self):
-        user_data = web.input(_unicode=False)
-
-        feed_cache = caches.get_cache(**user_data)
-
-        result = JsonRssResult(user_data.json, request_etag=user_data.get('etag'))
-        feed_cache.add_feed_result(result)
+    result = JsonRssResult(request.query['json'], request_etag=request.query.get('etag'))
+    cache.add_feed_result(result)
 
 
-def serve(feed_caches, port=8088):
-    global caches
-    caches = feed_caches
+class BottlePlugin(object):
+    def __init__(self, **kwargs):
+        self._kwargs = kwargs
 
-    sys.argv = ['localhost']
-    sys.argv.append(str(port))
-    app.run()
+    def apply(self, callback, context):
+        """Return a decorated route callback."""
+        args = inspect.getargspec(context['callback'])[0]
+        # Skip this callback if we don't need to do anything
 
-    #After Keyboard Interrupt
-    print 'Closing Caches'
-    caches.close()
+        keywords = {k: v for k, v in self._kwargs.iteritems() if k in args}
+
+        if not keywords:
+            return callback
+
+        def wrapper(*a, **ka):
+            ka.update(keywords)
+            rv = callback(*a, **ka)
+            return rv
+
+        return wrapper
+
+    def __str__(self):
+        components = '\n'.join(('{component} (keyword={keyword})'.format(component=component,
+                                                                         keyword=keyword)
+                                for keyword, component in self._kwargs.iteritems()))
+
+        return '{klass} using:\n{components})'.format(klass=self.__class__.__name__,
+                                                      components=components)
+
+    def __repr__(self):
+        return str(self)
+
+
+class CachesPlugin(BottlePlugin):
+    def __init__(self, caches, keyword='caches'):
+        """ :param keyword: """
+        super(CachesPlugin, self).__init__(**{keyword: caches})
+        self._caches = caches
+
+    def close(self):
+        print 'Closing Caches'
+        self._caches.close()
+
+
+def serve(feed_caches, port=8088, body_max_mb=100):
+    BaseRequest.MEMFILE_MAX = body_max_mb * 2 ** 20
+
+    plugin = CachesPlugin(feed_caches)
+    app.install(plugin)
+
+    app.run(port=port)

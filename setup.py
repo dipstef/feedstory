@@ -37,8 +37,7 @@ settings = dict(
     keywords='rss feed cache greader history',
     packages=['feedstory', 'feedstory.cache', 'feedstory.cache.db', 'feedstory.remote', 'feedstory.rss'],
     package_data={'': ['cache/feed_cache.sql']},
-    requires=['web.py', 'feedparser', 'quecco', 'urlo', 'httpy', 'procol'],
     test_suite='tests'
 )
 
-setup(**settings)
+setup(requires=['bottle', 'feedparser', 'quecco', 'urlo', 'httpy', 'procol'], **settings)
