@@ -1,3 +1,4 @@
+import ssl
 import time
 from urllib2 import URLError
 from dated import utc_from_string
@@ -12,6 +13,7 @@ def _to_utc(datetime_string):
     utc = utc_from_string(datetime_string)
     return utc.timetuple()
 
+
 feedparser.registerDateHandler(_to_utc)
 
 
@@ -22,17 +24,22 @@ def parse_feed_result(feed_url, etag=None):
         except URLError, e:
             print_err(str(e))
             time.sleep(10)
+        except ssl.CertificateError:
+            raise
         except BaseException, e:
             print_err_trace('Exception: %s : %s' % (type(e), e))
             time.sleep(60)
 
 
-def _parse_feed_result(feed_url, etag=None):
+def _parse_feed_result(feed_url, etag=None, ssl_validate=True):
     feed = _feed_parse(feed_url, etag)
 
-    if not 'bozo_exception' in feed:
+    if not ssl_validate:
+        ssl._create_default_https_context = ssl._create_unverified_context
+
+    if 'bozo_exception' not in feed:
         return FeedUnchanged(feed_url, feed, etag) if feed.status == 304 else RssResult(feed, etag)
-    elif isinstance(feed.bozo_exception, URLError):
+    elif isinstance(feed.bozo_exception, (URLError, ssl.CertificateError)):
         raise feed.bozo_exception
     else:
         return RssErrorResult(feed, feed.bozo_exception, etag)
